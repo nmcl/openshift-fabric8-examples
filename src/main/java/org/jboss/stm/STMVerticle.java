@@ -28,6 +28,15 @@ import org.jboss.stm.Container;
 
 import com.arjuna.ats.arjuna.AtomicAction;
 
+/**
+ * This verticle is pretty artificial and is here only so that the module
+ * has something that people can look at and hopefully understand where STM
+ * fits in.
+ *
+ * Could consider removing this and making the module a pure library version, with
+ * some tests/examples separate.
+ */
+
 public class STMVerticle extends Verticle {
     
     public STMVerticle ()
@@ -123,6 +132,9 @@ public class STMVerticle extends Verticle {
     container.logger().info("STMVerticle started");
   }
 
+    /*
+     * Have a persistent container for this example, but it's likely recoverable and optimistic cc are better for Vert.x.
+     */
     static final private Container<Sample> theContainer = new Container<Sample>("Demo", Container.TYPE.PERSISTENT, Container.MODEL.SHARED);
     static private Sample transactionalObject = null;
 }
