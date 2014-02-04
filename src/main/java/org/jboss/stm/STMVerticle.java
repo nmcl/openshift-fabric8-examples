@@ -121,10 +121,12 @@ public class STMVerticle extends Verticle {
 
           //Now send some data
           for (int i = 0; i < 10; i++) {
+	      
+	      int value = STMVerticle.value();
 
-	    message.reply("pong! "+STMVerticle.value());
+	    message.reply("pong! "+value);
 
-	    container.logger().info("Sent back pong");
+	    container.logger().info("Sent back pong "+value);
 	  }
       }
       });
