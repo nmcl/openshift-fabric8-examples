@@ -20,7 +20,6 @@ import org.vertx.java.core.Handler;
 import org.vertx.java.platform.Verticle;
 import org.vertx.java.core.eventbus.Message;
 
-import com.arjuna.ats.arjuna.common.Uid;
 import org.jboss.stm.annotations.Transactional;
 import org.jboss.stm.annotations.ReadLock;
 import org.jboss.stm.annotations.State;
@@ -28,7 +27,6 @@ import org.jboss.stm.annotations.WriteLock;
 import org.jboss.stm.Container;
 
 import com.arjuna.ats.arjuna.AtomicAction;
-import com.arjuna.ats.arjuna.ObjectModel;
 
 public class STMVerticle extends Verticle {
     
@@ -37,6 +35,18 @@ public class STMVerticle extends Verticle {
 	transactionalObject = theContainer.create(new SampleLockable(10));
 
 	System.out.println("Object name: "+theContainer.getIdentifier(transactionalObject));
+
+	AtomicAction A = new AtomicAction();
+
+	/*
+	 * Flush state to disk (for this example).
+	 */
+
+	A.begin();
+
+	transactionalObject.increment();
+
+	A.commit();
     }
 
     @Transactional
