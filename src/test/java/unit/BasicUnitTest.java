@@ -25,19 +25,9 @@ import org.jboss.stm.annotations.State;
 import org.jboss.stm.annotations.Transactional;
 import org.jboss.stm.annotations.ReadLock;
 import org.jboss.stm.annotations.WriteLock;
-import org.jboss.stm.internal.RecoverableContainer;
+import org.jboss.stm.Container;
 
 import com.arjuna.ats.arjuna.AtomicAction;
-import com.arjuna.ats.arjuna.ObjectType;
-import com.arjuna.ats.arjuna.common.Uid;
-import com.arjuna.ats.arjuna.coordinator.ActionStatus;
-import com.arjuna.ats.arjuna.coordinator.BasicAction;
-import com.arjuna.ats.arjuna.state.InputObjectState;
-import com.arjuna.ats.arjuna.state.OutputObjectState;
-import com.arjuna.ats.txoj.Lock;
-import com.arjuna.ats.txoj.LockManager;
-import com.arjuna.ats.txoj.LockMode;
-import com.arjuna.ats.txoj.LockResult;
 
 import org.junit.Test;
 import static org.vertx.testtools.VertxAssert.*;
@@ -48,6 +38,13 @@ import static org.vertx.testtools.VertxAssert.*;
 
 public class BasicUnitTest
 {   
+    /**
+     * This is out Transactional interface. We'll use this as the type for a
+     * Container.
+     */
+
+    // default pessimistic
+
     @Transactional
     public interface Atomic
     {
@@ -61,6 +58,11 @@ public class BasicUnitTest
     @Transactional
     public class ExampleSTM implements Atomic
     {   
+	/*
+	 * Define read/write operations here. Can do them in the interface
+	 * if you want.
+	 */
+
         @ReadLock
         public int get () throws Exception
         {
@@ -79,19 +81,43 @@ public class BasicUnitTest
             state += value;
         }
 
+	/**
+	 * This is the state that will be manipulated (saved and restored).
+	 */
+
         private int state;
     }
 
     @Test
     public void testExampleSTM () throws Exception
     {
-        RecoverableContainer<Atomic> theContainer = new RecoverableContainer<Atomic>();
+	/*
+	 * Create the container for the Transactional interface.
+	 */
+        Container<Atomic> theContainer = new Container<Atomic>();
+
+	/*
+	 * Create the instance of the class. But this won't be an STM object yet, so don't
+	 * manipulate it just yet.
+	 */
+
         ExampleSTM basic = new ExampleSTM();
         boolean success = true;
+
+	/*
+	 * This object will be the one we actually use.
+	 */
+
         Atomic obj = null;
         
         try
         {
+	    /*
+	     * Pass the instance we created previously to the Container so it
+	     * can then create an STM object which we then use to manipulate
+	     * the first object in a transactional manner.
+	     */
+
             obj = theContainer.enlist(basic);
         }
         catch (final Throwable ex)
@@ -103,6 +129,8 @@ public class BasicUnitTest
         
         assertTrue(success);
         
+	// a transaction!
+
         AtomicAction a = new AtomicAction();
         
         a.begin();
@@ -117,10 +145,10 @@ public class BasicUnitTest
 
         a.begin();
 
-        obj.change(1);
+        obj.change(1);  // the value at this stage will be 1235
         
         a.abort();
 
-        assertEquals(obj.get(), 1234);
+        assertEquals(obj.get(), 1234);  // we aborted, so the value should be back to 1234
     }
 }
