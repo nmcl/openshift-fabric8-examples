@@ -1,4 +1,4 @@
-package test.unit;
+package unit;
 
 import org.junit.Test;
 
@@ -118,7 +118,7 @@ public class BasicUnitTest
 	     * the first object in a transactional manner.
 	     */
 
-            obj = theContainer.enlist(basic);
+            obj = theContainer.create(basic);
         }
         catch (final Throwable ex)
         {

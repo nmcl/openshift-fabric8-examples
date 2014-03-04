@@ -1,4 +1,4 @@
-package org.jboss.stm.integration.java;
+package integration.java;
 /*
  * Copyright 2013 Red Hat, Inc.
  *

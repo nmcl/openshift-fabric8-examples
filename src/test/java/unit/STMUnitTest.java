@@ -1,4 +1,4 @@
-package test.unit;
+package unit;
 
 import org.jboss.stm.STMVerticle;
 import org.junit.Test;
